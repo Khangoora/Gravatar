@@ -14,9 +14,6 @@ class ViewController: UIViewController {
     @IBOutlet weak var imageView: UIImageView!
     @IBOutlet weak var textField: UITextField!
     @IBOutlet weak var button: UIButton!
-    var imageReturned : UIImage?
-    let imageCache = AutoPurgingImageCache()
-    var avatarCachedImage : UIImage?
 
     let photoCache = AutoPurgingImageCache(
         memoryCapacity: 100 * 1024 * 1024,
@@ -100,7 +97,6 @@ class ViewController: UIViewController {
     func stopLoading(){
         
         MBProgressHUD.hideAllHUDsForView(self.view, animated: true)
-        
     }
 
 
