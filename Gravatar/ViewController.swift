@@ -15,9 +15,13 @@ class ViewController: UIViewController {
     @IBOutlet weak var textField: UITextField!
     @IBOutlet weak var button: UIButton!
     var imageReturned : UIImage?
-    var previousTextFieldString: String = ""
     let imageCache = AutoPurgingImageCache()
     var avatarCachedImage : UIImage?
+
+    let photoCache = AutoPurgingImageCache(
+        memoryCapacity: 100 * 1024 * 1024,
+        preferredMemoryUsageAfterPurge: 60 * 1024 * 1024
+    )
 
 
     var gravatarAPI = GravatarAPI()
@@ -28,27 +32,21 @@ class ViewController: UIViewController {
         {
             setAlert("Alert", message: "Your internet is not working")
         }
-
-
     }
     
     @IBAction func buttonPressed(sender: AnyObject) {
         startLoading()
-        
         if(textField.text != "" ){
-            if ((textField.text != previousTextFieldString) && (imageView.image == nil) ) {
-                gravatarAPI.getImageFromGravatar(textField.text!)
-                previousTextFieldString = textField.text!
-                
-                delay(1.0){
-                    self.setImageView()
-                }
-            }
-            else{
-                //no need to make additional network request
-                setAlert("Alert", message: "You are making the same search again.")
+            if cachedImage(textField.text!) != nil {
+                imageView.image = cachedImage(textField.text!)
                 stopLoading()
-                return
+            }
+            else {
+                    gravatarAPI.getImageFromGravatar(textField.text!)
+                    delay(1.0){
+                        self.setImageView()
+                        self.cacheImage(self.gravatarAPI.imageFromGravatar!, title: self.textField.text!)
+                }
             }
         }
         else {
@@ -82,6 +80,15 @@ class ViewController: UIViewController {
             closure
         )
     }
+    
+    func cacheImage(image: Image, title: String) {
+        photoCache.addImage(image, withIdentifier: title)
+    }
+    
+    func cachedImage(title: String) -> Image? {
+        return photoCache.imageWithIdentifier(title)
+    }
+
     
     func startLoading(){
         let loadingNotification = MBProgressHUD.showHUDAddedTo(self.view, animated: true)
