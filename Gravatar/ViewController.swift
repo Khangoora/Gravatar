@@ -29,6 +29,8 @@ class ViewController: UIViewController {
         {
             setAlert("Alert", message: "Your internet is not working")
         }
+        
+        getImage()
     }
     
     @IBAction func buttonPressed(sender: AnyObject) {
@@ -39,10 +41,10 @@ class ViewController: UIViewController {
                 stopLoading()
             }
             else {
-                    gravatarAPI.getImageFromGravatar(textField.text!)
-                    delay(1.0){
-                        self.setImageView()
-                        self.cacheImage(self.gravatarAPI.imageFromGravatar!, title: self.textField.text!)
+                    gravatarAPI.getImage(textField.text!){ (responseObject, error) in
+                    self.imageView.image = responseObject
+                    self.cacheImage(responseObject!, title: self.textField.text!)
+                    self.stopLoading()
                 }
             }
         }
@@ -59,6 +61,11 @@ class ViewController: UIViewController {
             alert.addAction(UIAlertAction(title: "Click", style: UIAlertActionStyle.Default, handler: nil))
             self.presentViewController(alert, animated: true, completion: nil)
         }
+    
+    
+    //here you call authenticateUser with a closure that prints responseObject
+    func getImage(){
+    }
     func setImageView()
     {
 

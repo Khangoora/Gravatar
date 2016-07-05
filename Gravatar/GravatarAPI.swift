@@ -16,41 +16,33 @@ class GravatarAPI {
     
     
     let GRAVATAR_URL = "https://www.gravatar.com/avatar/"
-    var hashedEmail = ""
-    var imageFromGravatar : UIImage?
     var count = 0
     
     
-    //Trim leading and trailing whitespace from an email address
-    //Force all characters to lower-case
-    //md5 hash the final string
-    func emailHash(email : String) -> String {
-        return email.md5
+    func getImage(email: String, completionHandler: (responseObject: UIImage?, error: NSError?) -> ()) {
+        makeImageCall(email, completionHandler: completionHandler)
     }
     
-    
-    func getImageFromGravatar(email:String) {
-        
-        hashedEmail = email.md5
-        Alamofire.request(.GET, GRAVATAR_URL+hashedEmail)
+    func makeImageCall(email : String, completionHandler: (responseObject: UIImage?,
+        error: NSError?) -> ()) {
+        Alamofire.request(.GET, GRAVATAR_URL+email.md5)
             .responseImage { response in
-                debugPrint(response)
                 
-                print(response.request)
-                print(response.response)
-                debugPrint(response.result)
-                
-                if let image = response.result.value {
-                    print("image downloaded: \(image)")
-                    self.imageFromGravatar = image
+                if response.result.value != nil {
+                    completionHandler(responseObject: response.result.value as UIImage!, error: response.result.error)
                 }
                 else{
                     if (self.count)<=3{
-                    self.getImageFromGravatar(email)
-                    self.count += 1
+                        self.makeImageCall(email, completionHandler: completionHandler)
+                        self.count += 1
                     }
                 }
+                completionHandler(responseObject: response.result.value as UIImage!, error: response.result.error)
         }
+    }
+    
+    func emailHash(email : String) -> String {
+        return email.md5
     }
 }
 extension String  {
