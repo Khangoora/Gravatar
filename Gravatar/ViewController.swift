@@ -39,8 +39,10 @@ class ViewController: UIViewController {
             if ((textField.text != previousTextFieldString) && (imageView.image == nil) ) {
                 gravatarAPI.getImageFromGravatar(textField.text!)
                 previousTextFieldString = textField.text!
-                setImageView()
                 
+                delay(1.0){
+                    self.setImageView()
+                }
             }
             else{
                 //no need to make additional network request
@@ -54,14 +56,7 @@ class ViewController: UIViewController {
         setAlert("Alert", message: "TextField is Empty")
         return
         }
-        setImageView()
-        stopLoading()
 
-    }
-
-    func setCachedData() {
-        
-     
     }
     
     func setAlert(title: String, message: String) {
@@ -76,6 +71,17 @@ class ViewController: UIViewController {
         stopLoading()
     }
 
+
+    func delay(delay: Double, closure: ()->()) {
+        dispatch_after(
+            dispatch_time(
+                DISPATCH_TIME_NOW,
+                Int64(delay * Double(NSEC_PER_SEC))
+            ),
+            dispatch_get_main_queue(),
+            closure
+        )
+    }
     
     func startLoading(){
         let loadingNotification = MBProgressHUD.showHUDAddedTo(self.view, animated: true)

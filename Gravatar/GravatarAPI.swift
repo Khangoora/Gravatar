@@ -18,6 +18,7 @@ class GravatarAPI {
     let GRAVATAR_URL = "https://www.gravatar.com/avatar/"
     var hashedEmail = ""
     var imageFromGravatar : UIImage?
+    var count = 0
     
     
     //Trim leading and trailing whitespace from an email address
@@ -43,10 +44,14 @@ class GravatarAPI {
                     print("image downloaded: \(image)")
                     self.imageFromGravatar = image
                 }
-              
+                else{
+                    if (self.count)<=3{
+                    self.getImageFromGravatar(email)
+                    self.count += 1
+                    }
+                }
         }
     }
-
 }
 extension String  {
     var md5: String! {
